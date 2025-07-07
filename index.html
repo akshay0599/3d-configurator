@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -13,99 +14,106 @@
       height: 100vh;
     }
     header {
-      padding: 1rem;
-      background: #333;
+      padding: 10px;
+      background: #202124;
       color: white;
       text-align: center;
     }
     main {
-      display: flex;
       flex: 1;
+      display: flex;
+      flex-direction: row;
     }
     aside {
       width: 250px;
-      padding: 1rem;
-      background: #f0f0f0;
-      border-right: 1px solid #ccc;
+      background: #f1f1f1;
+      padding: 15px;
+      box-sizing: border-box;
     }
     model-viewer {
       flex: 1;
-      height: 100%;
+      background-color: #e0e0e0;
     }
     input[type="file"] {
-      margin-bottom: 1rem;
+      margin-bottom: 10px;
     }
     label {
       display: block;
-      margin: 0.5rem 0;
+      margin: 10px 0 5px;
     }
   </style>
 </head>
 <body>
+
   <header>
-    <h1>3D Model Viewer Editor</h1>
+    <h2>3D Model Viewer Editor</h2>
   </header>
+
   <main>
     <aside>
-      <label>
-        Load Model:
-        <input type="file" id="fileInput" accept=".glb,.gltf" />
-      </label>
-      <label>
-        <input type="checkbox" id="autoRotate" checked /> Auto Rotate
-      </label>
-      <label>
-        <input type="checkbox" id="cameraControls" checked /> Camera Controls
-      </label>
-      <label>
-        Environment:
-        <select id="environment">
-          <option value="neutral">Neutral</option>
-          <option value="sunset">Sunset</option>
-          <option value="city">City</option>
-          <option value="dawn">Dawn</option>
-          <option value="night">Night</option>
-        </select>
-      </label>
+      <input type="file" id="file-input" accept=".glb,.gltf" />
+      
+      <label><input type="checkbox" id="auto-rotate" checked> Auto Rotate</label>
+      <label><input type="checkbox" id="camera-controls" checked> Camera Controls</label>
+      <label><input type="checkbox" id="shadow-intensity" checked> Shadows</label>
+
+      <label>Background Color</label>
+      <input type="color" id="bg-color" value="#e0e0e0" />
+
+      <label>Environment</label>
+      <select id="environment">
+        <option value="neutral">Neutral</option>
+        <option value="legacy">Legacy</option>
+        <option value="sunset">Sunset</option>
+        <option value="city">City</option>
+      </select>
     </aside>
+
     <model-viewer id="viewer"
-      src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
-      alt="A 3D model viewer"
-      camera-controls
-      auto-rotate
-      environment-image="neutral"
-      shadow-intensity="1"
+      src=""
+      alt="3D model"
       ar
-      ar-modes="webxr scene-viewer quick-look"
+      auto-rotate
+      camera-controls
+      shadow-intensity="1"
+      exposure="1"
+      environment-image="neutral"
       style="width: 100%; height: 100%;">
     </model-viewer>
   </main>
+
   <script>
     const viewer = document.getElementById('viewer');
-    const fileInput = document.getElementById('fileInput');
-    const autoRotate = document.getElementById('autoRotate');
-    const cameraControls = document.getElementById('cameraControls');
-    const environment = document.getElementById('environment');
+    const fileInput = document.getElementById('file-input');
 
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        viewer.src = url;
-      }
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      viewer.src = url;
     });
 
-    autoRotate.addEventListener('change', () => {
-      viewer.autoRotate = autoRotate.checked;
+    document.getElementById('auto-rotate').addEventListener('change', e => {
+      viewer.autoRotate = e.target.checked;
     });
 
-    cameraControls.addEventListener('change', () => {
-      viewer.cameraControls = cameraControls.checked;
+    document.getElementById('camera-controls').addEventListener('change', e => {
+      viewer.cameraControls = e.target.checked;
     });
 
-    environment.addEventListener('change', () => {
-      viewer.environmentImage = environment.value;
+    document.getElementById('shadow-intensity').addEventListener('change', e => {
+      viewer.shadowIntensity = e.target.checked ? 1 : 0;
+    });
+
+    document.getElementById('bg-color').addEventListener('input', e => {
+      viewer.style.backgroundColor = e.target.value;
+    });
+
+    document.getElementById('environment').addEventListener('change', e => {
+      viewer.environmentImage = e.target.value;
     });
   </script>
+
 </body>
 </html>
+
