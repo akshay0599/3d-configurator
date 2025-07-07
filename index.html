@@ -2,29 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>3D Configurator</title>
+  <title>3D Viewer</title>
   <style>
-    body { margin: 0; font-family: sans-serif; background: #eee; }
-    h1 { text-align: center; margin-top: 10px; }
-    #upload, #controls { display: block; margin: 10px auto; text-align: center; }
-    button { margin: 5px; padding: 8px 16px; font-size: 14px; cursor: pointer; }
+    body { margin: 0; overflow: hidden; }
+    #upload {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: sans-serif;
+    }
   </style>
 </head>
 <body>
-
-  <h1>3D Configurator (Unnamed Parts)</h1>
   <input type="file" id="upload" accept=".glb,.gltf" />
-  
-  <div id="controls">
-    <h3>Apply Colors to Parts</h3>
-    <button onclick="setColor(0, 'red')">Part 0 - Red</button>
-    <button onclick="setColor(1, 'blue')">Part 1 - Blue</button>
-    <button onclick="setColor(2, 'black')">Part 2 - Black</button>
-    <button onclick="setColor(3, 'white')">Part 3 - White</button>
-    <br>
-    <button onclick="setAll('green')">Set All to Green</button>
-  </div>
-
-  <script type="module" src="main.js"></script>
+  <script type="module" src="viewer.js"></script>
 </body>
 </html>
