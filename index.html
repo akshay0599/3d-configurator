@@ -1,11 +1,111 @@
-<model-viewer src="Upload model..." ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral" poster="poster.webp" shadow-intensity="1">
-    <div class="progress-bar hide" slot="progress-bar">
-        <div class="update-bar"></div>
-    </div>
-    <button slot="ar-button" id="ar-button">
-        View in your space
-    </button>
-    <div id="ar-prompt">
-        <img src="https://modelviewer.dev/shared-assets/icons/hand.png">
-    </div>
-</model-viewer>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Model Viewer Editor</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 1rem;
+      background: #333;
+      color: white;
+      text-align: center;
+    }
+    main {
+      display: flex;
+      flex: 1;
+    }
+    aside {
+      width: 250px;
+      padding: 1rem;
+      background: #f0f0f0;
+      border-right: 1px solid #ccc;
+    }
+    model-viewer {
+      flex: 1;
+      height: 100%;
+    }
+    input[type="file"] {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>3D Model Viewer Editor</h1>
+  </header>
+  <main>
+    <aside>
+      <label>
+        Load Model:
+        <input type="file" id="fileInput" accept=".glb,.gltf" />
+      </label>
+      <label>
+        <input type="checkbox" id="autoRotate" checked /> Auto Rotate
+      </label>
+      <label>
+        <input type="checkbox" id="cameraControls" checked /> Camera Controls
+      </label>
+      <label>
+        Environment:
+        <select id="environment">
+          <option value="neutral">Neutral</option>
+          <option value="sunset">Sunset</option>
+          <option value="city">City</option>
+          <option value="dawn">Dawn</option>
+          <option value="night">Night</option>
+        </select>
+      </label>
+    </aside>
+    <model-viewer id="viewer"
+      src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+      alt="A 3D model viewer"
+      camera-controls
+      auto-rotate
+      environment-image="neutral"
+      shadow-intensity="1"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      style="width: 100%; height: 100%;">
+    </model-viewer>
+  </main>
+  <script>
+    const viewer = document.getElementById('viewer');
+    const fileInput = document.getElementById('fileInput');
+    const autoRotate = document.getElementById('autoRotate');
+    const cameraControls = document.getElementById('cameraControls');
+    const environment = document.getElementById('environment');
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        viewer.src = url;
+      }
+    });
+
+    autoRotate.addEventListener('change', () => {
+      viewer.autoRotate = autoRotate.checked;
+    });
+
+    cameraControls.addEventListener('change', () => {
+      viewer.cameraControls = cameraControls.checked;
+    });
+
+    environment.addEventListener('change', () => {
+      viewer.environmentImage = environment.value;
+    });
+  </script>
+</body>
+</html>
