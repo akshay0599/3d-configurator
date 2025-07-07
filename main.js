@@ -1,9 +1,8 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
-import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/RGBELoader.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/OrbitControls.js';
 
-let scene, camera, renderer, controls, currentModel;
+let scene, camera, renderer, controls, currentModel, meshParts = [];
 
 init();
 
@@ -20,9 +19,10 @@ document.getElementById('upload').addEventListener('change', (event) => {
 
 function init() {
   scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf0f0f0);
 
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 2, 5);
+  camera.position.set(0, 1, 5);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -31,14 +31,12 @@ function init() {
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
 
-  // HDRI LIGHTING 🌅
-  new RGBELoader()
-    .setPath('./') // <-- env.hdr should be here
-    .load('env.hdr', function (texture) {
-      texture.mapping = THREE.EquirectangularReflectionMapping;
-      scene.environment = texture;
-      scene.background = texture;
-    });
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 10, 7.5);
+  scene.add(light);
+
+  const ambient = new THREE.AmbientLight(0xffffff, 1);
+  scene.add(ambient);
 
   animate();
 }
@@ -50,12 +48,21 @@ function loadGLB(data) {
     currentModel = gltf.scene;
     scene.add(currentModel);
 
+    meshParts = [];
+    currentModel.traverse(obj => {
+      if (obj.isMesh) {
+        meshParts.push(obj);
+        obj.material = new THREE.MeshStandardMaterial({ color: 0xdddddd });
+      }
+    });
+
+    console.log("Mesh parts found:", meshParts.length);
+
     const box = new THREE.Box3().setFromObject(currentModel);
     const size = box.getSize(new THREE.Vector3()).length();
     const center = box.getCenter(new THREE.Vector3());
 
-    controls.reset();
-    currentModel.position.sub(center); // Center it
+    currentModel.position.sub(center);
     camera.position.set(0, 1, size * 1.5);
     controls.target.set(0, 0, 0);
     controls.update();
@@ -75,13 +82,17 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-window.changeColor = function (partName, colorHex) {
-  if (!currentModel) return;
-  const part = currentModel.getObjectByName(partName);
-  if (part && part.material) {
-    part.material.color.set(colorHex);
+window.setColor = function(index, color) {
+  if (meshParts[index]) {
+    meshParts[index].material.color.set(color);
   } else {
-    console.warn(`Part "${partName}" not found.`);
+    console.warn("Part", index, "not found.");
   }
-}
+};
+
+window.setAll = function(color) {
+  meshParts.forEach(mesh => {
+    mesh.material.color.set(color);
+  });
+};
 
